@@ -2,29 +2,22 @@ import os
 import time
 import re
 import model
-import logger
+from talker_exceptions import TalkerException
 from slackclient import SlackClient
 from make_sentence import make_sentence
 # instantiate Slack client
 slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
-starterbot_id = None
+bot_id = None
 
 # constants
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 
-class TalkerException(Exception):
-    pass
-
-
-class UserNotFoundException(TalkerException):
-    pass
-
-
-class UserHasntSpoken(TalkerException):
-    pass
+def set_bot_id(id):
+    global bot_id
+    bot_id = id
 
 
 def save_user(item):
@@ -135,12 +128,7 @@ def save_message(item):
     session.commit()
 
 
-def parse_bot_commands(slack_events):
-    """
-    Parses a list of events coming from the Slack RTM API to find bot commands.
-    If a bot command is found, this function returns a tuple of command 
-    and channel.  If its not found, then this function returns None, None.
-    """
+def parse_events(slack_events):
     for event in slack_events:
         # ignore edits
         if 'subtype' in event:
@@ -149,13 +137,17 @@ def parse_bot_commands(slack_events):
         if 'bot_id' in event:
             continue
         if event["type"] == "message":
-            user_id, message = parse_direct_mention(event["text"])
-            if user_id == starterbot_id:
-                return message, event["channel"]
-            else:
-                save_user(event)
-                save_message(event)
-    return None, None
+            parse_bot_commands(event)
+
+
+def parse_bot_commands(event):
+    print(event["channel"], event["text"])
+    user_id, message = parse_direct_mention(event["text"])
+    if user_id == bot_id:
+        handle_command(message, event["channel"])
+    else:
+        save_user(event)
+        save_message(event)
 
 
 def parse_direct_mention(message_text):
@@ -203,12 +195,9 @@ if __name__ == "__main__":
     if slack_client.rtm_connect(with_team_state=False):
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
-        starterbot_id = slack_client.api_call("auth.test")["user_id"]
+        set_bot_id(slack_client.api_call("auth.test")["user_id"])
         while True:
-            command, channel = parse_bot_commands(slack_client.rtm_read())
-            if command:
-                print(channel, command)
-                handle_command(command, channel)
+            parse_events(slack_client.rtm_read())
             time.sleep(RTM_READ_DELAY)
     else:
         print("Connection failed. Exception traceback printed above.")

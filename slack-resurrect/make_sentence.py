@@ -4,7 +4,7 @@ import sys, math, random, re
 
 import model
 from model import WordEntry
-import talker_exceptions as exceptions
+import talker_exceptions
 
 from sqlalchemy.sql.expression import func
 from sqlalchemy import Column, Integer, MetaData, String, Table, desc
@@ -43,7 +43,7 @@ def make_sentence(username, prompt=""):
     # Try to find the user
     user = model.User.byname(session, username)
     if not user:
-        raise exceptions.UserNotFoundException(
+        raise talker_exceptions.UserNotFoundException(
             'Username "{}" not found'.format(username))
 
     sentence = ''
@@ -61,7 +61,7 @@ def make_sentence(username, prompt=""):
             model.WordEntry.word_prev == ''
         ).order_by(func.rand()).first()
     if not word:
-        raise exceptions.UserHasntSpoken(
+        raise talker_exceptions.UserHasntSpoken(
             'I haven\'t seen "{}" say anything'.format(username))
     word = word.word_next
     sentence += word
