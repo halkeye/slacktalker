@@ -1,19 +1,16 @@
 # coding: utf-8
+import os
 from sqlalchemy import Column, Integer, MetaData, String, Table, desc
 from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 import random
 
-import settings
+BaseModel = declarative_base()
 
 
-Base = declarative_base()
-
-
-class WordEntry(Base):
+class WordEntry(BaseModel):
 
     __tablename__ = 'word_entries'
 
@@ -27,13 +24,14 @@ class WordEntry(Base):
                                                      self.word_next)
 
     def next(self, session):
-        words = session.query(WordEntry)\
-            .filter(WordEntry.user == self.user, WordEntry.word_prev == self.word_next)\
-            .order_by(desc(WordEntry.count)).limit(10)
+        words = session.query(WordEntry).filter(
+            WordEntry.user == self.user,
+            WordEntry.word_prev == self.word_next
+        ).order_by(desc(WordEntry.count)).limit(10)
         return random.choice(list(words))
 
 
-class User(Base):
+class User(BaseModel):
 
     __tablename__ = 'users'
 
@@ -49,33 +47,35 @@ class User(Base):
     image_192 = Column('image_192', String(255))
     image_original = Column('image_original', String(255))
 
+    @classmethod
+    def byid(cls, session, id):
+        return session.query(cls).filter(cls.id == id).first()
+
+    @classmethod
+    def byname(cls, session, id):
+        return session.query(cls).filter(cls.name == id).first()
+
     def __repr__(self):
         return "<model.User '{} - {}'>".format(self.name.encode('utf8'),
                                                self.real_name.encode('utf8'))
 
-    def __str__(self):
+    def pretty_name(self):
         if self.real_name:
             return self.real_name.encode('utf8')
         if self.first_name and self.last_name:
-            return "{} {}".format(self.first_name.encode('utf8'), self.last_name.encode('utf8'))
+            return "{} {}".format(
+                self.first_name.encode('utf8'),
+                self.last_name.encode('utf8')
+            )
         return self.name.encode('utf8')
 
 
 def get_session():
-    engine = create_engine(
-        'mysql://root:{}@localhost/slacktalker?charset=utf8'.format(
-            settings.db_password))
+    engine = create_engine(os.environ['DATABASE_URL'], echo=False)
     Session = sessionmaker(bind=engine)
     return Session()
 
 
-if __name__ == '__main__':
-    engine = create_engine('mysql://root:{}@localhost/?charset=utf8'.format(
-        settings.db_password))
-    engine.execute(
-        """
-        CREATE DATABASE IF NOT EXISTS slacktalker
-          DEFAULT CHARACTER SET = 'utf8'
-          DEFAULT COLLATE 'utf8_general_ci';""")
-    engine.execute("USE slacktalker")
-    Base.metadata.create_all(engine)
+def create_all():
+    engine = create_engine(os.environ['DATABASE_URL'])
+    BaseModel.metadata.create_all(engine)

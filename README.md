@@ -35,3 +35,11 @@ Data-loading
  * `parse_words.py` - loads up words from the various channels and puts them into the database
  * `model.py` - the models for interacting with the DB.  If run directly, this will build the tables needed for loading data
  * `crontab.sauce` - the crontab responsible for looking for updated data and auto-loading it
+
+# Schema
+
+```
+CREATE DATABASE IF NOT EXISTS slacktalker
+DEFAULT CHARACTER SET = 'utf8'
+DEFAULT COLLATE 'utf8_general_ci';
+```
