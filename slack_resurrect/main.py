@@ -2,10 +2,9 @@
 Slack glue to the resurrect modules
 """
 import os
-import time
 import re
 from slackclient import SlackClient
-from . import model
+from .model import get_session, User, WordEntry
 from .talker_exceptions import TalkerException
 from .make_sentence import make_sentence
 
@@ -46,13 +45,13 @@ def save_user(item):
     if 'subtype' in item:
         return
 
-    session = model.get_session()
-    db_user = model.User.byid(session, item['user'])
+    session = get_session()
+    db_user = User.byid(session, item['user'])
 
     if not db_user:
         slack_user = SLACK_CLIENT.api_call(
             'users.info', user=item['user']).get('user')
-        db_user = model.User(
+        db_user = User(
             id=slack_user['id'],
             name=slack_user['name'],
             real_name=slack_user['profile'].get('real_name', ''),
@@ -88,19 +87,19 @@ def save_message(item):
     # Ignore edits
     if 'subtype' in item:
         return
-    session = model.get_session()
+    session = get_session()
     words = item['text'].split()
     for i in list(range(len(words) + 1)):
         user = item['user']
         word_prev = words[i - 1].lower()[:254] if i > 0 else ''
         word_next = words[i].lower()[:254] if i < len(words) else ''
-        word_entry = session.query(model.WordEntry).filter(
-            model.WordEntry.user == user,
-            model.WordEntry.word_prev == word_prev,
-            model.WordEntry.word_next == word_next
+        word_entry = session.query(WordEntry).filter(
+            WordEntry.user == user,
+            WordEntry.word_prev == word_prev,
+            WordEntry.word_next == word_next
         ).first()
         if not word_entry:
-            word_entry = model.WordEntry()
+            word_entry = WordEntry()
             word_entry.user = user
             word_entry.word_prev = word_prev
             word_entry.word_next = word_next
@@ -117,13 +116,13 @@ def save_message(item):
             words[i - 2].lower()[:254],
             words[i - 1].lower()[:254]
         )
-        word_entry = session.query(model.WordEntry).filter(
-            model.WordEntry.user == user,
-            model.WordEntry.word_prev == word_prev,
-            model.WordEntry.word_next == word_next
+        word_entry = session.query(WordEntry).filter(
+            WordEntry.user == user,
+            WordEntry.word_prev == word_prev,
+            WordEntry.word_next == word_next
         ).first()
         if not word_entry:
-            word_entry = model.WordEntry()
+            word_entry = WordEntry()
             word_entry.user = user
             word_entry.word_prev = word_prev
             word_entry.word_next = word_next
@@ -204,15 +203,3 @@ def handle_command(command, channel):
         text=response or default_response
     )
     return ""
-
-if __name__ == "__main__":
-    model.create_all()
-    if SLACK_CLIENT.rtm_connect(with_team_state=False):
-        print("Starter Bot connected and running!")
-        # Read bot's user ID by calling Web API method `auth.test`
-        set_bot_id(SLACK_CLIENT.api_call("auth.test")["user_id"])
-        while True:
-            parse_events(SLACK_CLIENT.rtm_read())
-            time.sleep(RTM_READ_DELAY)
-    else:
-        print("Connection failed. Exception traceback printed above.")

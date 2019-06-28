@@ -2,8 +2,7 @@ from builtins import str, range
 import random
 import re
 
-from sqlalchemy.sql.expression import func
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 from .model import WordEntry, get_session, User
 from .talker_exceptions import UserNotFoundException, UserHasntSpoken
@@ -51,14 +50,14 @@ def make_sentence(username, prompt=""):
         word = SESSION.query(WordEntry).filter(
             WordEntry.user == user.id,
             WordEntry.word_prev == prompt
-        ).order_by(func.rand()).first()
+        ).order_by(func.random()).first()
     if word:
         sentence += word.word_prev + " "
     else:
         word = SESSION.query(WordEntry).filter(
             WordEntry.user == user.id,
             WordEntry.word_prev == ''
-        ).order_by(func.rand()).first()
+        ).order_by(func.random()).first()
     if not word:
         raise UserHasntSpoken(
             'I haven\'t seen "{}" say anything'.format(username))
