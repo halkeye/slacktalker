@@ -1,13 +1,13 @@
 # coding: utf-8
 import os
-from sqlalchemy import Column, Integer, MetaData, String, Table, desc
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.orm import sessionmaker
 import random
+from sqlalchemy import Column, Integer, String, desc
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-BaseModel = declarative_base()
+
+BaseModel = declarative_base()  # pylint: disable=invalid-name
 
 
 class WordEntry(BaseModel):
@@ -48,12 +48,12 @@ class User(BaseModel):
     image_original = Column('image_original', String(255))
 
     @classmethod
-    def byid(cls, session, id):
-        return session.query(cls).filter(cls.id == id).first()
+    def byid(cls, session, _id):
+        return session.query(cls).filter(cls.id == _id).first()
 
     @classmethod
-    def byname(cls, session, id):
-        return session.query(cls).filter(cls.name == id).first()
+    def byname(cls, session, _id):
+        return session.query(cls).filter(cls.name == _id).first()
 
     def __repr__(self):
         return "<model.User '{} - {}'>".format(self.name.encode('utf8'),
@@ -72,8 +72,8 @@ class User(BaseModel):
 
 def get_session():
     engine = create_engine(os.environ['DATABASE_URL'], echo=False)
-    Session = sessionmaker(bind=engine)
-    return Session()
+    session = sessionmaker(bind=engine)
+    return session()
 
 
 def create_all():

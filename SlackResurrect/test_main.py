@@ -1,5 +1,5 @@
 import pytest
-from main import set_bot_id, parse_direct_mention
+from .main import set_bot_id, parse_direct_mention
 
 
 @pytest.yield_fixture(autouse=True)

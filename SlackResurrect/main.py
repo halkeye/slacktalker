@@ -1,23 +1,30 @@
+"""
+Slack glue to the resurrect modules
+"""
 import os
 import time
 import re
-import model
-from talker_exceptions import TalkerException
 from slackclient import SlackClient
-from make_sentence import make_sentence
+from . import model
+from .talker_exceptions import TalkerException
+from .make_sentence import make_sentence
+
 # instantiate Slack client
-slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+SLACK_CLIENT = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
 # starterbot's user ID in Slack: value is assigned after the bot starts up
-bot_id = None
+BOT_ID = None
 
 # constants
 RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 
-def set_bot_id(id):
-    global bot_id
-    bot_id = id
+def set_bot_id(_id):
+    """
+    Sets the global bot id
+    """
+    global BOT_ID  # pylint: disable=global-statement
+    BOT_ID = _id
 
 
 def save_user(item):
@@ -43,7 +50,7 @@ def save_user(item):
     db_user = model.User.byid(session, item['user'])
 
     if not db_user:
-        slack_user = slack_client.api_call(
+        slack_user = SLACK_CLIENT.api_call(
             'users.info', user=item['user']).get('user')
         db_user = model.User(
             id=slack_user['id'],
@@ -107,8 +114,8 @@ def save_message(item):
         if i < 2:
             continue
         word_prev = '%s %s' % (
-            words[i-2].lower()[:254],
-            words[i-1].lower()[:254]
+            words[i - 2].lower()[:254],
+            words[i - 1].lower()[:254]
         )
         word_entry = session.query(model.WordEntry).filter(
             model.WordEntry.user == user,
@@ -129,6 +136,9 @@ def save_message(item):
 
 
 def parse_events(slack_events):
+    """
+    Handle the various slack events
+    """
     for event in slack_events:
         # ignore edits
         if 'subtype' in event:
@@ -141,9 +151,13 @@ def parse_events(slack_events):
 
 
 def parse_bot_commands(event):
+    """
+    Given a slack event, parse out the bot command, then respond if nesessary
+    or save to the db
+    """
     print(event["channel"], event["text"])
     user_id, message = parse_direct_mention(event["text"])
-    if user_id == bot_id:
+    if user_id == BOT_ID:
         handle_command(message, event["channel"])
     else:
         save_user(event)
@@ -162,8 +176,8 @@ def parse_direct_mention(message_text):
     # the second group contains the remaining message
     if matches:
         return (matches.group(1), matches.group(2).strip())
-    else:
-        return (None, None)
+
+    return (None, None)
 
 
 def handle_command(command, channel):
@@ -176,28 +190,30 @@ def handle_command(command, channel):
     # Finds and executes the given command, filling in response
     response = None
 
-    (username, prompt) = (command+" ").split(" ", 1)
+    (username, prompt) = (command + " ").split(" ", 1)
     if username:
         try:
             response = make_sentence(username, prompt)
-        except TalkerException as e:
-            return str(e)
+        except TalkerException as err:
+            ## FIXME - record the exception somewhere, but safe to ignore
+            return str(err)
 
     # Sends the response back to the channel
-    slack_client.api_call(
+    SLACK_CLIENT.api_call(
         "chat.postMessage",
         channel=channel,
         text=response or default_response
     )
+    return ""
 
 if __name__ == "__main__":
     model.create_all()
-    if slack_client.rtm_connect(with_team_state=False):
+    if SLACK_CLIENT.rtm_connect(with_team_state=False):
         print("Starter Bot connected and running!")
         # Read bot's user ID by calling Web API method `auth.test`
-        set_bot_id(slack_client.api_call("auth.test")["user_id"])
+        set_bot_id(SLACK_CLIENT.api_call("auth.test")["user_id"])
         while True:
-            parse_events(slack_client.rtm_read())
+            parse_events(SLACK_CLIENT.rtm_read())
             time.sleep(RTM_READ_DELAY)
     else:
         print("Connection failed. Exception traceback printed above.")

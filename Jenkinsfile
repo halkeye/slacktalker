@@ -31,7 +31,7 @@ pipeline {
 
     stage('Lint') {
       steps {
-        sh 'pylint --rcfile=./pylintrc slack-resurrect > pylint.log'
+        sh 'pylint --errors-only --rcfile=./pylintrc SlackResurrect > pylint.log'
       }
       post {
         always {
