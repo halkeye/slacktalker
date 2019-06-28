@@ -27,8 +27,13 @@ pipeline {
     stage('Lint') {
       steps {
         sh 'pylint --rcfile=./pylintrc slack-resurrect > pylint.log'
-				recordIssues aggregatingResults: true, enabledForFailure: true, tools: [pyLint(pattern: 'pylint.log')]
       }
+      post {
+        always {
+          recordIssues aggregatingResults: true, enabledForFailure: true, tools: [pyLint(pattern: 'pylint.log')]
+        }
+      }
+
     }
 
     stage('Test') {
