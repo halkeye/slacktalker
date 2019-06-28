@@ -1,5 +1,10 @@
 pipeline {
   agent { docker { image 'python:3.7.3-stretch' } }
+  environment {
+    registry = "halkeye/slack-resurrect"
+    registryCredential = 'dockerhub-halkeye'
+    dockerImage = ''
+  }
 
   options {
     timeout(time: 10, unit: 'MINUTES')
@@ -48,16 +53,20 @@ pipeline {
       stages {
         stage('Build') {
           steps {
-            sh 'docker build -t halkeye/slack-foodee .'
+            script {
+              dockerImage = docker.build registry
+            }
           }
         }
 
         stage('Deploy') {
           when { branch 'master' }
-          environment { DOCKER = credentials('dockerhub-halkeye') }
           steps {
-            sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
-            sh 'docker push halkeye/slack-foodee'
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                dockerImage.push()
+              }
+            }
           }
         }
       }
