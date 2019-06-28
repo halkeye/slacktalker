@@ -195,8 +195,7 @@ def handle_command(command, channel):
         try:
             response = make_sentence(username, prompt)
         except TalkerException as err:
-            ## FIXME - record the exception somewhere, but safe to ignore
-            return str(err)
+            response = str(err)
 
     # Sends the response back to the channel
     SLACK_CLIENT.api_call(
