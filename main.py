@@ -10,7 +10,7 @@ from slack_resurrect.web import app
 
 LOG = logging.getLogger(__name__)
 
-rollbar.init(CONFIG.ROLLBAR_TOKEN)
+rollbar.init(CONFIG.ROLLBAR_TOKEN, CONFIG.ROLLBAR_ENVIRONMENT)
 
 try:
     create_all()
