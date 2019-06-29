@@ -69,7 +69,7 @@ pipeline {
       stages {
         stage('Build') {
           steps {
-            sh "docker build -t ${registry} ."
+            sh "docker build -t ${dockerImage} ."
           }
         }
 
@@ -86,7 +86,7 @@ pipeline {
           }
           steps {
             sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
-            sh "docker push ${registry}"
+            sh "docker push ${dockerImage}"
           }
         }
       }
