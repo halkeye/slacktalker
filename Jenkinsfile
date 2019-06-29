@@ -4,6 +4,7 @@ pipeline {
     registry = "halkeye/slack-resurrect"
     registryCredential = 'dockerhub-halkeye'
     dockerImage = ''
+    DATABASE_URL = 'sqlite://'
   }
 
   options {

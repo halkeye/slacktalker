@@ -1,10 +1,10 @@
 # coding: utf-8
-import os
 import random
 from sqlalchemy import Column, Integer, String, desc
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from .settings import CONFIG
 
 
 BaseModel = declarative_base()  # pylint: disable=invalid-name
@@ -71,11 +71,11 @@ class User(BaseModel):
 
 
 def get_session():
-    engine = create_engine(os.environ['DATABASE_URL'], echo=False)
+    engine = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=False)
     session = sessionmaker(bind=engine)
     return session()
 
 
 def create_all():
-    engine = create_engine(os.environ['DATABASE_URL'])
+    engine = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI)
     BaseModel.metadata.create_all(engine)

@@ -1,4 +1,3 @@
-import os
 import time
 import logging
 
@@ -6,11 +5,11 @@ import rollbar
 
 from slack_resurrect.main import SLACK_CLIENT, RTM_READ_DELAY, set_bot_id, parse_events
 from slack_resurrect.model import create_all
+from slack_resurrect.settings import CONFIG
 
 LOG = logging.getLogger(__name__)
 
-if os.environ.get('ROLLBAR_TOKEN'):
-    rollbar.init(os.environ.get('ROLLBAR_TOKEN'))
+rollbar.init(CONFIG.ROLLBAR_TOKEN)
 
 try:
     create_all()
@@ -26,7 +25,7 @@ if SLACK_CLIENT.rtm_connect(with_team_state=False):
     while True:
         try:
             parse_events(SLACK_CLIENT.rtm_read())
-        except:
+        except: # pylint: disable=broad-exception
             LOG.error("Exception occurred", exc_info=True)
             rollbar.report_exc_info()
         time.sleep(RTM_READ_DELAY)

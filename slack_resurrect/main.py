@@ -1,15 +1,15 @@
 """
 Slack glue to the resurrect modules
 """
-import os
 import re
 from slackclient import SlackClient
 from .model import get_session, User, WordEntry
 from .talker_exceptions import TalkerException
 from .make_sentence import make_sentence
+from .settings import CONFIG
 
 # instantiate Slack client
-SLACK_CLIENT = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
+SLACK_CLIENT = SlackClient(CONFIG.SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 BOT_ID = None
 
