@@ -25,7 +25,7 @@ if SLACK_CLIENT.rtm_connect(with_team_state=False):
     while True:
         try:
             parse_events(SLACK_CLIENT.rtm_read())
-        except: # pylint: disable=broad-exception
+        except:  # pylint: disable=broad-exception
             LOG.error("Exception occurred", exc_info=True)
             rollbar.report_exc_info()
         time.sleep(RTM_READ_DELAY)

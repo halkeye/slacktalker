@@ -4,7 +4,8 @@ pipeline {
   agent any
 
   options {
-    timeout(time: 10, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    timeout(time: 30, unit: 'MINUTES')
     ansiColor('xterm')
   }
 
