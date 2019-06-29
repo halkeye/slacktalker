@@ -70,12 +70,14 @@ class User(BaseModel):
         return self.name.encode('utf8')
 
 
+def get_engine():
+    return create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=False)
+
+
 def get_session():
-    engine = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=False)
-    session = sessionmaker(bind=engine)
+    session = sessionmaker(bind=get_engine())
     return session()
 
 
 def create_all():
-    engine = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI)
-    BaseModel.metadata.create_all(engine)
+    BaseModel.metadata.create_all(get_engine())

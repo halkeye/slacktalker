@@ -137,3 +137,4 @@ pip-selfcheck.json
 .direnv
 .envrc
 pylint.log
+pytest-report.xml

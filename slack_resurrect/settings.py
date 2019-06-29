@@ -25,10 +25,10 @@ class ProductionConfig(Config):
     TESTING = False
 
 
-ENV = os.environ.get('APP_ENV', 'dev')
+ENV = os.environ.get('APP_ENV', os.environ.get('FLASK_ENV', 'development'))
 CONFIG = None
 
-if ENV == 'dev':
+if ENV == 'dev' or ENV == 'development':
     CONFIG = DevelopmentConfig
 elif ENV == 'test':
     CONFIG = TestingConfig
