@@ -65,6 +65,7 @@ pipeline {
     }
 
     stage('Docker') {
+      agent any
       stages {
         stage('Build') {
           steps {
