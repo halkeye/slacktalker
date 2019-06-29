@@ -77,7 +77,7 @@ pipeline {
           environment { DOCKER = credentials('dockerhub-halkeye') }
           steps {
             sh "docker login --username \"$DOCKER_USR\" --password=\"${DOCKER_PSW}\""
-            sh "docker push $[registry}"
+            sh "docker push ${registry}"
           }
         }
       }
