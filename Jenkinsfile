@@ -64,11 +64,18 @@ pipeline {
     }
 
     stage('Docker') {
-      environment { registry = "halkeye/slack-resurrect" }
+      environment {
+        registry = "halkeye/slack-resurrect"
+      }
       stages {
         stage('Build') {
           steps {
             sh "docker build -t ${registry} ."
+          }
+        }
+        stage('gavin') {
+          steps {
+            sh "echo gavin"
           }
         }
 
@@ -80,7 +87,6 @@ pipeline {
             DOCKER = credentials('dockerhub-halkeye')
           }
           steps {
-            sh 'echo hi'
             sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
             sh "docker push ${registry}"
           }
