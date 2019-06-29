@@ -76,8 +76,8 @@ pipeline {
           when { branch 'master' }
           environment { DOCKER = credentials('dockerhub-halkeye') }
           steps {
-            sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
-            sh 'docker push halkeye/slack-foodee'
+            sh "docker login --username \"$DOCKER_USR\" --password=\"${DOCKER_PSW}\""
+            sh "docker push $[registry}"
           }
         }
       }
