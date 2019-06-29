@@ -6,7 +6,6 @@ class Config:
     TESTING = False
     ROLLBAR_TOKEN = os.environ.get('ROLLBAR_TOKEN')
     ROLLBAR_ENVIRONMENT = None
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     SLACK_AUTH_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     PORT=3000
@@ -15,6 +14,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     ROLLBAR_ENVIRONMENT = 'development'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.sqlite'
 
 
 class TestingConfig(DevelopmentConfig):
@@ -27,6 +27,7 @@ class TestingConfig(DevelopmentConfig):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     ROLLBAR_ENVIRONMENT = 'production'
 
 
