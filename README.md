@@ -25,3 +25,11 @@ Configuration is done by environment variables
 6) Create a database
 7) Populate the "DATABASE_URL" variable
 
+## Importing Existing Data
+
+1) Export data from slack - See https://get.slack.help/hc/en-us/articles/201658943-Exporting-your-team-s-Slack-history
+2) Copy zip to where code is
+3) Run `python import.py $zipfile`
+4) Celebrate the success
+
+

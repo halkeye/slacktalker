@@ -44,13 +44,16 @@ def save_user(item):
     # Ignore edits
     if 'subtype' in item:
         return
+    save_actual_user(item['user'])
 
+
+def save_actual_user(item):
     session = get_session()
-    db_user = User.byid(session, item['user'])
+    db_user = User.byid(session, item)
 
     if not db_user:
         slack_user = SLACK_CLIENT.api_call(
-            'users.info', user=item['user']).get('user')
+            'users.info', user=item).get('user')
         db_user = User(
             id=slack_user['id'],
             name=slack_user['name'],
