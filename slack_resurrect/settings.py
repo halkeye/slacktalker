@@ -8,6 +8,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     SLACK_AUTH_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
+    PORT=3000
 
 
 class DevelopmentConfig(Config):

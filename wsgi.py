@@ -1,15 +1,12 @@
 from slack_resurrect.web import app
-import os
 
 if __name__ == "__main__":
-    import rollbar
     from slack_resurrect.settings import CONFIG
-    rollbar.init(CONFIG.ROLLBAR_TOKEN)
 
     app.jinja_env.auto_reload = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.run(
         debug=True,
-        port=int(os.environ.get("PORT", "3000")),
+        port=int(CONFIG.PORT),
         host="0.0.0.0"
     )
