@@ -65,24 +65,19 @@ pipeline {
     }
 
     stage('Docker') {
-      agent any
       stages {
         stage('Build') {
           steps {
-            script {
-              dockerImage = docker.build registry
-            }
+            sh "docker build -t ${registry} ."
           }
         }
 
         stage('Deploy') {
           when { branch 'master' }
+          environment { DOCKER = credentials("${registryCredential}") }
           steps {
-            script {
-              docker.withRegistry( '', registryCredential ) {
-                dockerImage.push()
-              }
-            }
+            sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
+            sh 'docker push halkeye/slack-foodee'
           }
         }
       }
