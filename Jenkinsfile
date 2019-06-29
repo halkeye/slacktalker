@@ -1,3 +1,5 @@
+def dockerImage = "halkeye/slack-resurrect"
+
 pipeline {
   agent any
 
@@ -64,10 +66,6 @@ pipeline {
     }
 
     stage('Docker') {
-      environment {
-        registry = "halkeye/slack-resurrect"
-        DOCKER = credentials('dockerhub-halkeye')
-      }
       stages {
         stage('Build') {
           steps {
@@ -83,6 +81,9 @@ pipeline {
 
         stage('Deploy') {
           when { branch 'master' }
+          environment {
+            DOCKER = credentials('dockerhub-halkeye')
+          }
           steps {
             sh 'docker login --username $DOCKER_USR --password=$DOCKER_PSW'
             sh "docker push ${registry}"
