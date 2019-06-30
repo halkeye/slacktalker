@@ -19,12 +19,6 @@ except:
     rollbar.report_exc_info()
     raise SystemExit()
 
-app.run(
-    debug=True,
-    port=int(CONFIG.PORT),
-    host="0.0.0.0"
-)
-
 if SLACK_CLIENT.rtm_connect(with_team_state=False):
     print("Starter Bot connected and running!")
     # Read bot's user ID by calling Web API method `auth.test`

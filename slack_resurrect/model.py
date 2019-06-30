@@ -71,7 +71,7 @@ class User(BaseModel):
 
 
 def get_engine():
-    return create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=False)
+    return create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
 
 
 def get_session():

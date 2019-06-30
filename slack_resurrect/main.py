@@ -2,12 +2,14 @@
 Slack glue to the resurrect modules
 """
 import re
+import logging
 from slackclient import SlackClient
 from .model import get_session, User, WordEntry
 from .talker_exceptions import TalkerException
 from .make_sentence import make_sentence
 from .settings import CONFIG
 
+LOG = logging.getLogger(__name__)
 # instantiate Slack client
 SLACK_CLIENT = SlackClient(CONFIG.SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
@@ -144,22 +146,26 @@ def parse_events(slack_events):
     for event in slack_events:
         # ignore edits
         if 'subtype' in event:
+            LOG.warn('Is a subtype, so ignoring')
             continue
         # ignore bots
         if 'bot_id' in event:
+            LOG.warn('the bot triggered the event, ignoring')
             continue
+
         if event["type"] == "message":
-            parse_bot_commands(event)
+            parse_message_event(event)
+        else:
+            LOG.debug("Not a message type: %{type}", type=event["type"])
 
 
-def parse_bot_commands(event):
+def parse_message_event(event):
     """
     Given a slack event, parse out the bot command, then respond if nesessary
     or save to the db
     """
-    print(event["channel"], event["text"])
     user_id, message = parse_direct_mention(event["text"])
-    if user_id == BOT_ID:
+    if BOT_ID and user_id == BOT_ID:
         handle_command(message, event["channel"])
     else:
         save_user(event)

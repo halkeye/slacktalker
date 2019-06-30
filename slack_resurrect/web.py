@@ -2,10 +2,11 @@ import os
 import logging
 
 import rollbar
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from werkzeug.contrib.fixers import ProxyFix
 from healthcheck import HealthCheck
 from .model import get_engine
+from .main import CONFIG, parse_events,parse_direct_mention,handle_command,save_user,save_message
 
 LOG = logging.getLogger(__name__)
 
@@ -40,3 +41,31 @@ def root():
         'moo.html',
         data=dict()
     )
+
+
+@app.route('/slack/events/subscription', methods=['GET', 'POST'])
+def subscription():
+    slack_event = request.json
+    if slack_event['token'] != CONFIG.SLACK_TOKEN:
+        return 403
+
+    if slack_event['type'] == 'url_verification':
+        return slack_event['challenge']
+
+    if slack_event['type'] == 'event_callback':
+        event = slack_event['event']
+        if event['type'] == 'app_mention':
+            user_id, message = parse_direct_mention(event["text"])
+            if message:
+                handle_command(message, event["channel"])
+        if event['type'] == 'message':
+            user_id, message = parse_direct_mention(event["text"])
+            if not message:
+                save_user(event)
+                save_message(event)
+
+    if CONFIG.DEBUG:
+        from pprint import pprint
+        pprint(slack_event)
+
+    return ''

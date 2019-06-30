@@ -4,15 +4,19 @@ import os
 class Config:
     DEBUG = False
     TESTING = False
+    DEBUG_SQL = False
     ROLLBAR_TOKEN = os.environ.get('ROLLBAR_TOKEN')
     ROLLBAR_ENVIRONMENT = None
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     SLACK_AUTH_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
+    ## Webhooks token
+    SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
     PORT=3000
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    DEBUG_SQL = True
     ROLLBAR_ENVIRONMENT = 'development'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///development.sqlite'
 
