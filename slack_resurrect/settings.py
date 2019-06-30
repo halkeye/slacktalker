@@ -2,6 +2,15 @@ import os
 
 
 class Config:
+    @classmethod
+    def toJSON(cls):
+        import json
+        data = dict()
+        for item in dir(cls):
+            if item.isupper():
+                data[item] = getattr(cls, item)
+        return json.dumps(data)
+
     DEBUG = False
     TESTING = False
     DEBUG_SQL = False

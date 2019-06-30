@@ -71,6 +71,7 @@ class User(BaseModel):
 
 
 def get_engine():
+    print(CONFIG.toJSON())
     return create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
 
 
