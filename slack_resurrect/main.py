@@ -3,7 +3,7 @@ Slack glue to the resurrect modules
 """
 import re
 import logging
-from slackclient import SlackClient
+from slack import WebClient
 from .model import get_session, User, WordEntry
 from .talker_exceptions import TalkerException
 from .make_sentence import make_sentence
@@ -11,7 +11,7 @@ from .settings import CONFIG
 
 LOG = logging.getLogger(__name__)
 # instantiate Slack client
-SLACK_CLIENT = SlackClient(CONFIG.SLACK_BOT_TOKEN)
+SLACK_CLIENT = WebClient(token=CONFIG.SLACK_BOT_TOKEN)
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 BOT_ID = None
 
@@ -54,7 +54,7 @@ def save_actual_user(userId):
     db_user = User.byid(session, userId)
 
     if not db_user:
-        slack_user = SLACK_CLIENT.api_call('users.info', user=userId).get('user')
+        slack_user = SLACK_CLIENT.users_info(user=userId).get('user')
         db_user = User.new_from_slack(slack_user)
         session.add(db_user)
 
@@ -194,8 +194,7 @@ def handle_command(command, channel):
             response = str(err)
 
     # Sends the response back to the channel
-    SLACK_CLIENT.api_call(
-        "chat.postMessage",
+    SLACK_CLIENT.chat_postMessage(
         channel=channel,
         text=response or default_response
     )
