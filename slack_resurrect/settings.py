@@ -17,7 +17,6 @@ class Config:
     ROLLBAR_TOKEN = os.environ.get('ROLLBAR_TOKEN')
     ROLLBAR_ENVIRONMENT = None
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-    SLACK_AUTH_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     ## Webhooks token
     SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
     PORT=3000
