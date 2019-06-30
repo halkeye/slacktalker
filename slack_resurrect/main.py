@@ -54,21 +54,8 @@ def save_actual_user(item):
     db_user = User.byid(session, item)
 
     if not db_user:
-        slack_user = SLACK_CLIENT.api_call(
-            'users.info', user=item).get('user')
-        db_user = User(
-            id=slack_user['id'],
-            name=slack_user['name'],
-            real_name=slack_user['profile'].get('real_name', ''),
-            first_name=slack_user['profile'].get('first_name', ''),
-            last_name=slack_user['profile'].get('last_name', ''),
-            image_24=slack_user['profile'].get('image_24', ''),
-            image_32=slack_user['profile'].get('image_32', ''),
-            image_48=slack_user['profile'].get('image_48', ''),
-            image_72=slack_user['profile'].get('image_72', ''),
-            image_192=slack_user['profile'].get('image_192', ''),
-            image_original=slack_user['profile'].get('image_original', ''),
-        )
+        slack_user = SLACK_CLIENT.api_call('users.info', user=item).get('user')
+        db_user = User.new_from_slack(slack_user)
         session.add(db_user)
 
     session.commit()

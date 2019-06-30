@@ -40,12 +40,16 @@ class User(BaseModel):
     real_name = Column('real_name', String(255))
     first_name = Column('first_name', String(255))
     last_name = Column('last_name', String(255))
-    image_24 = Column('image_24', String(255))
-    image_32 = Column('image_32', String(255))
-    image_48 = Column('image_48', String(255))
-    image_72 = Column('image_72', String(255))
-    image_192 = Column('image_192', String(255))
-    image_original = Column('image_original', String(255))
+
+    @classmethod
+    def new_from_slack(cls, slack_user):
+        return User(
+            id=slack_user['id'],
+            name=slack_user['name'],
+            real_name=slack_user['profile'].get('real_name', ''),
+            first_name=slack_user['profile'].get('first_name', ''),
+            last_name=slack_user['profile'].get('last_name', ''),
+        )
 
     @classmethod
     def byid(cls, session, _id):
