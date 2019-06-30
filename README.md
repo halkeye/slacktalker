@@ -10,8 +10,8 @@ Configuration is done by environment variables
 
 * SLACK_BOT_TOKEN - Bot User OAuth Access Token
 * DATABASE_URL - SQLAlchemy database uris - https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls<Paste>
- * Mysql example: mysql://root@localhost/slackresurrect?charset=utf8
- * Postgres example: postgresql://postgres:@localhost/slackresurrect
+    * Mysql example: mysql://root@localhost/slackresurrect?charset=utf8
+    * Postgres example: postgresql://postgres:@localhost/slackresurrect
 * ROLLBAR_TOKEN - optional - Token to talk to rollbar
 
 ## Installation
