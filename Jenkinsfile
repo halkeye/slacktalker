@@ -74,20 +74,21 @@ pipeline {
           }
         }
 
-        stage('gavin') {
-          steps {
-            sh "echo gavin"
-          }
-        }
-
         stage('Deploy') {
           when { branch 'master' }
-          environment {
-            LOGIN = credentials('dockerhub-halkeye')
-          }
+          environment { DOCKER = credentials('dockerhub-halkeye') }
           steps {
-            sh 'docker login --username $LOGIN_USR --password=$LOGIN_PSW'
+            sh 'docker login --username="$DOCKER_USR" --password="$DOCKER_PSW"'
             sh "docker push ${dockerImage}"
+          }
+        }
+        stage('Deploy release') {
+          when { buildingTag() }
+          environment { DOCKER = credentials('dockerhub-halkeye') }
+          steps {
+            sh 'docker login --username="$DOCKER_USR" --password="$DOCKER_PSW"'
+            sh "docker tag ${dockerImage} ${dockerImage}:${TAG_NAME}"
+            sh "docker push ${dockerImage}:${TAG_NAME}"
           }
         }
       }
