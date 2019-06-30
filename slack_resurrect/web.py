@@ -38,7 +38,7 @@ app.health.add_check(db_available)
 @app.route('/')
 def root():
     return render_template(
-        'moo.html',
+        'index.html',
         data=dict()
     )
 
