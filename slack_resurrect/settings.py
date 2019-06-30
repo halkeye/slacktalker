@@ -31,6 +31,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(DevelopmentConfig):
     TESTING = True
+    DEBUG_SQL = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     ROLLBAR_TOKEN = None
     ROLLBAR_ENVIRONMENT = 'testing'

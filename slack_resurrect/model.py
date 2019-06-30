@@ -40,11 +40,13 @@ class User(BaseModel):
     real_name = Column('real_name', String(255))
     first_name = Column('first_name', String(255))
     last_name = Column('last_name', String(255))
+    team_id = Column('team_id', String(255))
 
     @classmethod
     def new_from_slack(cls, slack_user):
         return User(
             id=slack_user['id'],
+            team_id=slack_user['team_id'],
             name=slack_user['name'],
             real_name=slack_user['profile'].get('real_name', ''),
             first_name=slack_user['profile'].get('first_name', ''),
@@ -63,20 +65,27 @@ class User(BaseModel):
         return "<model.User '{} - {}'>".format(self.name.encode('utf8'),
                                                self.real_name.encode('utf8'))
 
+    @property
     def pretty_name(self):
         if self.real_name:
-            return self.real_name.encode('utf8')
+            return str(self.real_name)
         if self.first_name and self.last_name:
             return "{} {}".format(
-                self.first_name.encode('utf8'),
-                self.last_name.encode('utf8')
+                str(self.first_name),
+                str(self.last_name)
             )
-        return self.name.encode('utf8')
+        return str(self.name)
+
+
+ENGINE = None
 
 
 def get_engine():
+    global ENGINE
     print(CONFIG.toJSON())
-    return create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
+    if not ENGINE:
+        ENGINE = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
+    return ENGINE
 
 
 def get_session():
