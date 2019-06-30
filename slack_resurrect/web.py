@@ -6,7 +6,7 @@ from flask import Flask, render_template, request
 from werkzeug.contrib.fixers import ProxyFix
 from healthcheck import HealthCheck
 from .model import get_engine
-from .main import CONFIG, parse_events,parse_direct_mention,handle_command,save_user,save_message
+from .main import CONFIG, parse_direct_mention, handle_command, save_user, save_message
 
 LOG = logging.getLogger(__name__)
 

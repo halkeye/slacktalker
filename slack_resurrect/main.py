@@ -127,26 +127,6 @@ def save_message(item):
     session.commit()
 
 
-def parse_events(slack_events):
-    """
-    Handle the various slack events
-    """
-    for event in slack_events:
-        # ignore edits
-        if 'subtype' in event:
-            LOG.warn('Is a subtype, so ignoring')
-            continue
-        # ignore bots
-        if 'bot_id' in event:
-            LOG.warn('the bot triggered the event, ignoring')
-            continue
-
-        if event["type"] == "message":
-            parse_message_event(event)
-        else:
-            LOG.debug("Not a message type: %{type}", type=event["type"])
-
-
 def parse_message_event(event):
     """
     Given a slack event, parse out the bot command, then respond if nesessary

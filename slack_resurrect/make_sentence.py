@@ -70,9 +70,7 @@ def make_sentence(username, prompt=""):
             sentence += ' ' + word
         else:
             break
-    sentence = "*{}:* {}".format(
-        user.pretty_name.decode('utf-8'),
-        sentence)
+    sentence = "*{}:* {}".format(user.pretty_name, sentence)
 
     # Slack surrounds URLs with < and >, which breaks their linking.  So we
     # strip that out.
