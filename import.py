@@ -3,12 +3,14 @@ import zipfile
 import json
 
 from slack_resurrect.main import get_session, User, save_message
+from slack_resurrect.model import create_all
 
 
 def main(filename):
     print("importing " + filename)
     archive = zipfile.ZipFile(filename, 'r')
 
+    create_all()
     session = get_session()
     for slack_user in json.loads(archive.read('users.json')):
         db_user = User.byid(session, slack_user['id'])
