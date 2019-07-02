@@ -82,7 +82,6 @@ ENGINE = None
 
 def get_engine():
     global ENGINE
-    print(CONFIG.toJSON())
     if not ENGINE:
         ENGINE = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
     return ENGINE
