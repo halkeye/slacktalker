@@ -13,7 +13,7 @@ LOG = logging.getLogger(__name__)
 app = Flask(
     __name__,
     template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
-    static_url_path=os.path.join(os.path.dirname(__file__), 'static')
+    static_url_path=''
 )
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.health = HealthCheck(app, "/healthcheck")
