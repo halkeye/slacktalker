@@ -26,17 +26,36 @@
         <p>Probably not, when in doubt, run it yourself</p>
         <p>That being said, we store your slack team id, user id, name, and some random words you've said, no full sentences</p>
         <h2>Lets see an example</h2>
-        <img src="{{ url_for('static', filename='example.png') }}" alt="example output screenshot" />
+        {% macro slack_line(username, isApp, prettyName, text) -%}
+        <div style="display: grid; grid-template-columns: 36px auto; margin-bottom: 10px; ">
+            <div style="height: 36px; line-height: 36px; width: 36px;">
+                <img src="{{ url_for('static', filename="%s_avatar.png" % username) }}" alt="{{ username }} avatar" height="100%" width="100%" />
+            </div>
+            <div style="margin-left: 10px; font-size: 12px;">
+                <div style="line-height: 24px;">
+                    <strong>{{ prettyName }}</strong>
+                    <span style="color: #616061; font-size:12px; line-height: 1">9:04 PM</span>
+                </div>
+                <div>
+                    {{ text | safe }}
+                </div>
+            </div>
+        </div>
+        {%- endmacro %}
+
+        {{ slack_line("gavin", False, "Gavin", "<a href='#' class='username_slug'>@Resurrect</a> carter") }}
+        {{ slack_line("resurrectbot", True, "Resurrect", "<strong>Carter Rabasa:</strong> we cover all of the react hooks guide. you'll need to really dive deep, show us the people something they didn't know.") }}
+        {{ slack_line("gavin", False, "Gavin", "<a href='#' class='username_slug'>@Resurrect</a> carter") }}
+        {{ slack_line("resurrectbot", True, "Resurrect", "<strong>Carter Rabasa:</strong> not yet, but it under the people something they didn't know..") }}
+
         <p></p>
         <p></p>
         <p><sub>[1] Aledgedly might have possibly probably would have said</sub></p>
       </section>
       <section id="sidebar">
           <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Resurrect Bot Logo (By Renee)" />
+          <sub>Logo design by reneewtf</sub>
       </section>
     </div>
-    <footer>
-        Logo design by reneewtf
-    </footer>
   </body>
 </html>

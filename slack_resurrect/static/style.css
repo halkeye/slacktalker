@@ -57,6 +57,16 @@ body {
     width: 100%;
 }
 
+.username_slug {
+    background: #e8f5fa;
+    padding: 0 2px 1px 2px;
+    border-radius: 3px;
+}
+
+a.username_slug, a.username_slug:link, a.username_slug:visited {
+    color: #1264a3;
+}
+
 #main {
     grid-area: main;
     margin: 50px;
