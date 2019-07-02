@@ -14,8 +14,8 @@ class Config:
     DEBUG = False
     TESTING = False
     DEBUG_SQL = False
-    ROLLBAR_TOKEN = os.environ.get('ROLLBAR_TOKEN')
-    ROLLBAR_ENVIRONMENT = None
+    SENTRY_TOKEN = os.environ.get('SENTRY_TOKEN')
+    SENTRY_ENVIRONMENT = None
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
     ## Webhooks token
     SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
@@ -25,7 +25,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     DEBUG_SQL = True
-    ROLLBAR_ENVIRONMENT = 'development'
+    SENTRY_ENVIRONMENT = 'development'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///development.sqlite'
 
 
@@ -33,15 +33,15 @@ class TestingConfig(DevelopmentConfig):
     TESTING = True
     DEBUG_SQL = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
-    ROLLBAR_TOKEN = None
-    ROLLBAR_ENVIRONMENT = 'testing'
+    SENTRY_TOKEN = None
+    SENTRY_ENVIRONMENT = 'testing'
 
 
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    ROLLBAR_ENVIRONMENT = 'production'
+    SENTRY_ENVIRONMENT = 'production'
 
 
 ENV = os.environ.get('APP_ENV', os.environ.get('FLASK_ENV', 'development'))

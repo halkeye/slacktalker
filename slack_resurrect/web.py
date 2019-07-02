@@ -1,8 +1,9 @@
 import os
 import logging
 
-import rollbar
+import sentry_sdk
 from flask import Flask, render_template, request
+from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.contrib.fixers import ProxyFix
 from healthcheck import HealthCheck
 from .model import get_engine
@@ -18,6 +19,13 @@ app = Flask(
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.health = HealthCheck(app, "/healthcheck")
 
+if CONFIG.SENTRY_TOKEN:
+    sentry_sdk.init(
+        CONFIG.SENTRY_TOKEN,
+        environment=CONFIG.SENTRY_ENVIRONMENT,
+        integrations=[FlaskIntegration()]
+    )
+
 
 # add your own check function to the healthcheck
 def db_available():
@@ -26,9 +34,9 @@ def db_available():
         result = engine.execute("SELECT 1")
         result.close()
         return True, "db ok"
-    except:
+    except Exception as exp:
         LOG.error("Exception occurred", exc_info=True)
-        rollbar.report_exc_info()
+        sentry_sdk.capture_exception(exp)
         return False, "db failure"
 
 

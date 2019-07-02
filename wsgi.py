@@ -1,6 +1,6 @@
 import logging
 
-import rollbar
+import sentry_sdk
 
 from slack_resurrect.model import create_all
 from slack_resurrect.settings import CONFIG
@@ -8,13 +8,14 @@ from slack_resurrect.web import app
 
 LOG = logging.getLogger(__name__)
 
-rollbar.init(CONFIG.ROLLBAR_TOKEN, CONFIG.ROLLBAR_ENVIRONMENT)
+if CONFIG.SENTRY_TOKEN:
+    sentry_sdk.init(CONFIG.SENTRY_TOKEN, environment=CONFIG.SENTRY_ENVIRONMENT)
 
 try:
     create_all()
-except:
+except Exception as exp:
     LOG.error("Exception occurred", exc_info=True)
-    rollbar.report_exc_info()
+    sentry_sdk.capture_exception(exp)
     raise SystemExit()
 
 if __name__ == '__main__':

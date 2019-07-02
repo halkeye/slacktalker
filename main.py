@@ -1,7 +1,7 @@
 import time
 import logging
 
-import rollbar
+import sentry_sdk
 
 from slack import RTMClient
 from slack_resurrect.main import SLACK_CLIENT, RTM_READ_DELAY, set_bot_id, parse_message_event
@@ -11,13 +11,14 @@ from slack_resurrect.web import app
 
 LOG = logging.getLogger(__name__)
 
-rollbar.init(CONFIG.ROLLBAR_TOKEN, CONFIG.ROLLBAR_ENVIRONMENT)
+if CONFIG.SENTRY_TOKEN:
+    sentry_sdk.init(CONFIG.SENTRY_TOKEN, environment=CONFIG.SENTRY_ENVIRONMENT)
 
 try:
     create_all()
-except:
+except Exception as exp:
     LOG.error("Exception occurred", exc_info=True)
-    rollbar.report_exc_info()
+    sentry_sdk.capture_exception(exp)
     raise SystemExit()
 
 
@@ -39,8 +40,8 @@ def say_hello(**payload):
     try:
         event['type'] = 'message'
         parse_message_event(event)
-    except:  # pylint: disable=bare-except
+    except Exception as exp:
         LOG.error("Exception occurred", exc_info=True)
-        rollbar.report_exc_info()
+        sentry_sdk.capture_exception(exp)
 
 rtmclient.start()
