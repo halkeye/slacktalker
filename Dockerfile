@@ -1,7 +1,7 @@
 FROM python:3.7.3-stretch
 WORKDIR /usr/src/app
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --upgrade -r requirements.txt
 COPY . .
 CMD ["gunicorn","-b","0.0.0.0:3000","wsgi:app"]
 HEALTHCHECK --interval=5m --timeout=3s \
