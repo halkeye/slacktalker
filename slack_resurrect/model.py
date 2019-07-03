@@ -58,8 +58,8 @@ class User(BaseModel):
         return session.query(cls).filter(cls.id == _id).first()
 
     @classmethod
-    def byname(cls, session, _id):
-        return session.query(cls).filter(cls.name == _id).first()
+    def byname(cls, session, team_id, _id):
+        return session.query(cls).filter(cls.name == _id).filter(cls.team_id == team_id).first()
 
     def __repr__(self):
         return "<model.User '{} - {}'>".format(self.name.encode('utf8'),

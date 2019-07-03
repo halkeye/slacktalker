@@ -74,7 +74,7 @@ def subscription():
         if event['type'] == 'app_mention':
             user_id, message = parse_direct_mention(event["text"])
             if message:
-                handle_command(message, event["channel"])
+                handle_command(slack_event['team_id'], message, event["channel"])
         if event['type'] == 'message':
             user_id, message = parse_direct_mention(event["text"])
             if not message:

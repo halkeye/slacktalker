@@ -134,7 +134,7 @@ def parse_message_event(event):
     """
     user_id, message = parse_direct_mention(event["text"])
     if BOT_ID and user_id == BOT_ID:
-        handle_command(message, event["channel"])
+        handle_command(event["team_id"], message, event["channel"])
     else:
         save_user(event)
         save_message(event)
@@ -156,7 +156,7 @@ def parse_direct_mention(message_text):
     return (None, None)
 
 
-def handle_command(command, channel):
+def handle_command(team_id, command, channel):
     """
     Executes bot command if the command is known
     """
@@ -169,7 +169,7 @@ def handle_command(command, channel):
     (username, prompt) = (command + " ").split(" ", 1)
     if username:
         try:
-            response = make_sentence(username, prompt)
+            response = make_sentence(team_id, username, prompt)
         except TalkerException as err:
             response = str(err)
 

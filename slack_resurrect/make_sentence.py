@@ -36,10 +36,10 @@ def get_next_word(user, word, last_words):
     return result
 
 
-def make_sentence(username, prompt=""):
+def make_sentence(team_id, username, prompt=""):
     sentence = ''
     # Try to find the user
-    user = User.byname(SESSION, username)
+    user = User.byname(SESSION, team_id, username)
     if not user:
         raise UserNotFoundException(
             'Username "{}" not found'.format(username))
