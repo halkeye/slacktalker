@@ -1,6 +1,5 @@
 import random
 from .db import db
-from .settings import CONFIG
 
 
 class WordEntry(db.Model):

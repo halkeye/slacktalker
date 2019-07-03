@@ -3,10 +3,17 @@ import logging
 
 import sentry_sdk
 from flask import Flask, render_template, request
+from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.middleware.proxy_fix import ProxyFix
 from healthcheck import HealthCheck
 from .db import db
 from .main import CONFIG, parse_direct_mention, handle_command, save_user, save_message
+
+
+def sentry_integrations():
+    return [
+        FlaskIntegration()
+    ]
 
 
 def create_app():

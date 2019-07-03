@@ -3,7 +3,7 @@ import logging
 import sentry_sdk
 
 from slack_resurrect.settings import CONFIG
-from slack_resurrect.web import create_app, FlaskIntegration
+from slack_resurrect.web import create_app, sentry_integrations
 from slack_resurrect.db import db
 
 LOG = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ if CONFIG.SENTRY_TOKEN:
     sentry_sdk.init(
         dsn=CONFIG.SENTRY_TOKEN,
         environment=CONFIG.SENTRY_ENVIRONMENT,
-        integrations=[FlaskIntegration()]
+        integrations=sentry_integrations()
     )
 
 

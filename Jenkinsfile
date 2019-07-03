@@ -32,11 +32,11 @@ pipeline {
 
         stage('Lint') {
           steps {
-            sh 'pylint --errors-only --rcfile=./pylintrc slack_resurrect | tee pylint.log'
+            sh 'flake8 --format=pylint *.py slack_resurrect | tee pylint.log'
           }
           post {
             always {
-              recordIssues aggregatingResults: true, enabledForFailure: true, tools: [pyLint(pattern: 'pylint.log')]
+              recordIssues aggregatingResults: true, enabledForFailure: true, tools: [flake8(pattern: 'pylint.log')]
             }
           }
 

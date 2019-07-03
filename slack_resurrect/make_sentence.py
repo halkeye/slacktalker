@@ -13,6 +13,7 @@ from .talker_exceptions import UserNotFoundException, UserHasntSpoken
 WORD_PAIRS_WEIGHT = 1
 SENTENCE_WORD_LIMIT = 100
 
+
 def get_next_word(user, word, last_words):
     user_words = db.session.query(WordEntry).filter(
         WordEntry.user == user.id, WordEntry.word_prev == word

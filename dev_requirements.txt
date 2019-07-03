@@ -7,5 +7,6 @@ pytest-flask-sqlalchemy
 pytest-env
 pytest-mock
 pytest-sugar
-pylint
+flake8
+autopep8
 bumpversion

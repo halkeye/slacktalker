@@ -18,9 +18,9 @@ class Config:
     SENTRY_TOKEN = os.environ.get('SENTRY_TOKEN')
     SENTRY_ENVIRONMENT = None
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
-    ## Webhooks token
+    # Webhooks token
     SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
-    PORT=3000
+    PORT = 3000
 
 
 class DevelopmentConfig(Config):

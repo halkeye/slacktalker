@@ -17,7 +17,6 @@ SLACK_CLIENT = WebClient(token=CONFIG.SLACK_BOT_TOKEN)
 BOT_ID = None
 
 # constants
-RTM_READ_DELAY = 1  # 1 second delay between reading from RTM
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 
@@ -99,7 +98,7 @@ def save_message(item):
         word_entry.count += 1
         db.session.add(word_entry)
 
-    #two word combos
+    # two word combos
     for i, word_next in enumerate(words):
         word_next = word_next.lower()[:254]
         if i < 2:
