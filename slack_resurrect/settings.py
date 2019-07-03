@@ -36,6 +36,7 @@ class TestingConfig(DevelopmentConfig):
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     SENTRY_TOKEN = None
     SENTRY_ENVIRONMENT = 'testing'
+    SLACK_TOKEN = '3rm7Ngf57te4ncHKwSvWhseb'
 
 
 class ProductionConfig(Config):
