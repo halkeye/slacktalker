@@ -4,7 +4,7 @@ import json
 
 from slack_resurrect.main import User, save_message
 from slack_resurrect.db import db
-from slack_resurrect.app import app
+from slack_resurrect.app import create_app
 
 
 def main(filename):
@@ -24,6 +24,7 @@ def main(filename):
                 save_message(event)
 
 
+app = create_app()
 for item in sys.argv[1:]:
     with app.app_context():
         db.create_all()

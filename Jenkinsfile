@@ -44,7 +44,7 @@ pipeline {
 
         stage('Test') {
           steps {
-            sh 'py.test  --junitxml=pytest-report.xml --cov-report xml'
+            sh 'py.test  --junitxml=pytest-report.xml --cov-report xml --cov --cov-report term-missing'
           }
           post {
             always {

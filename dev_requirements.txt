@@ -1,10 +1,11 @@
 -r requirements.txt
-requests_mock
-mock
 flake8
 pytest
 pytest-cov
-pytest-mock
+pytest-flask
+pytest-flask-sqlalchemy
 pytest-env
+pytest-mock
+pytest-sugar
 pylint
 bumpversion

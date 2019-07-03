@@ -37,6 +37,7 @@ class TestingConfig(DevelopmentConfig):
     SENTRY_TOKEN = None
     SENTRY_ENVIRONMENT = 'testing'
     SLACK_TOKEN = '3rm7Ngf57te4ncHKwSvWhseb'
+    SLACK_BOT_TOKEN = None
 
 
 class ProductionConfig(Config):
