@@ -140,3 +140,8 @@ Jenkinsfile
 pylint.log
 pytest-report.xml
 *.sqlite
+*.pyc
+*/**/__pycache__
+.git/
+dev_requirements.txt
+.dependabot/
