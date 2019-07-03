@@ -1,4 +1,7 @@
 -r requirements.txt
+requests_mock
+mock
+flake8
 pytest
 pytest-cov
 pytest-mock

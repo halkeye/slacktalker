@@ -4,7 +4,7 @@ import logging
 import sentry_sdk
 from flask import Flask, render_template, request
 from sentry_sdk.integrations.flask import FlaskIntegration
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from healthcheck import HealthCheck
 from .model import get_engine
 from .main import CONFIG, parse_direct_mention, handle_command, save_user, save_message
@@ -16,6 +16,8 @@ app = Flask(
     template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
     static_url_path=''
 )
+
+app.config.from_object(CONFIG)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.health = HealthCheck(app, "/healthcheck")
 
@@ -55,13 +57,20 @@ def root():
 def subscription():
     slack_event = request.json
     if slack_event['token'] != CONFIG.SLACK_TOKEN:
-        return 403
+        return ('', 403)
 
     if slack_event['type'] == 'url_verification':
         return slack_event['challenge']
 
+    if CONFIG.DEBUG:
+        from pprint import pprint
+        pprint(slack_event)
+
     if slack_event['type'] == 'event_callback':
         event = slack_event['event']
+        if 'subtype' in event:
+            return ''
+
         if event['type'] == 'app_mention':
             user_id, message = parse_direct_mention(event["text"])
             if message:
@@ -71,9 +80,5 @@ def subscription():
             if not message:
                 save_user(event)
                 save_message(event)
-
-    if CONFIG.DEBUG:
-        from pprint import pprint
-        pprint(slack_event)
 
     return ''
