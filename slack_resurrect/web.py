@@ -17,7 +17,6 @@ def sentry_integrations():
 
 
 def create_app():
-    LOG = logging.getLogger(__name__)
     app = Flask(
         __name__,
         template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
@@ -36,7 +35,7 @@ def create_app():
             result.close()
             return True, "db ok"
         except Exception as exp:
-            LOG.error("Exception occurred", exc_info=True)
+            app.logger.error("Exception occurred", exc_info=True)
             sentry_sdk.capture_exception(exp)
             return False, "db failure"
 
@@ -51,31 +50,36 @@ def create_app():
 
     @app.route('/slack/events/subscription', methods=['GET', 'POST'])
     def subscription():
-        slack_event = request.json
-        if slack_event['token'] != CONFIG.SLACK_TOKEN:
-            return ('', 403)
+        try:
+            slack_event = request.json
+            if slack_event['token'] != CONFIG.SLACK_TOKEN:
+                return ('', 403)
 
-        if slack_event['type'] == 'url_verification':
-            return slack_event['challenge']
+            if slack_event['type'] == 'url_verification':
+                return slack_event['challenge']
 
-        if CONFIG.DEBUG:
-            from pprint import pprint
-            pprint(slack_event)
+            if CONFIG.DEBUG:
+                from pprint import pprint
+                pprint(slack_event)
 
-        if slack_event['type'] == 'event_callback':
-            event = slack_event['event']
-            if 'subtype' in event:
-                return ''
+            if slack_event['type'] == 'event_callback':
+                event = slack_event['event']
+                if 'subtype' in event:
+                    return ''
 
-            if event['type'] == 'app_mention':
-                user_id, message = parse_direct_mention(event["text"])
-                if message:
-                    handle_command(slack_event['team_id'], message, event["channel"])
-            if event['type'] == 'message':
-                user_id, message = parse_direct_mention(event["text"])
-                if not message:
-                    save_user(event)
-                    save_message(event)
+                if event['type'] == 'app_mention':
+                    user_id, message = parse_direct_mention(event["text"])
+                    if message:
+                        handle_command(slack_event['team_id'], message, event["channel"])
+                if event['type'] == 'message':
+                    user_id, message = parse_direct_mention(event["text"])
+                    if not message:
+                        save_user(event)
+                        save_message(event)
+        except Exception as exp:
+            app.logger.error("Exception occurred", exc_info=True)
+            sentry_sdk.capture_exception(exp)
+            return ('', 500)
 
         return ''
 
