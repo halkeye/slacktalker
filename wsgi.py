@@ -2,9 +2,9 @@ import logging
 
 import sentry_sdk
 
-from slack_resurrect.model import create_all
 from slack_resurrect.settings import CONFIG
 from slack_resurrect.web import app, FlaskIntegration
+from slack_resurrect.db import db
 
 LOG = logging.getLogger(__name__)
 
@@ -16,7 +16,8 @@ if CONFIG.SENTRY_TOKEN:
     )
 
 try:
-    create_all()
+    with app.app_context():
+        db.create_all()
 except Exception as exp:
     LOG.error("Exception occurred", exc_info=True)
     sentry_sdk.capture_exception(exp)
