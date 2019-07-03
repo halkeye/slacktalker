@@ -47,7 +47,7 @@ class ProductionConfig(Config):
     SENTRY_ENVIRONMENT = 'production'
 
 
-ENV = os.environ.get('APP_ENV', os.environ.get('FLASK_ENV', 'development'))
+ENV = os.environ.get('APP_ENV', os.environ.get('FLASK_ENV', 'prod'))
 CONFIG = None
 
 if ENV == 'dev' or ENV == 'development':
