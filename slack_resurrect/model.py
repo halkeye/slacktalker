@@ -28,11 +28,11 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column('id', db.String(9), primary_key=True)
+    team_id = db.Column('team_id', db.String(255), primary_key=True)
     name = db.Column('name', db.String(255))
     real_name = db.Column('real_name', db.String(255))
     first_name = db.Column('first_name', db.String(255))
     last_name = db.Column('last_name', db.String(255))
-    team_id = db.Column('team_id', db.String(255))
 
     @classmethod
     def new_from_slack(cls, slack_user):
