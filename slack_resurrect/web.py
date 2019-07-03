@@ -6,7 +6,7 @@ from flask import Flask, render_template, request
 from sentry_sdk.integrations.flask import FlaskIntegration
 from werkzeug.middleware.proxy_fix import ProxyFix
 from healthcheck import HealthCheck
-from .model import get_engine
+from .db import db
 from .main import CONFIG, parse_direct_mention, handle_command, save_user, save_message
 
 LOG = logging.getLogger(__name__)
@@ -20,6 +20,7 @@ app = Flask(
 app.config.from_object(CONFIG)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 app.health = HealthCheck(app, "/healthcheck")
+db.init_app(app)
 
 if CONFIG.SENTRY_TOKEN:
     sentry_sdk.init(
@@ -31,9 +32,8 @@ if CONFIG.SENTRY_TOKEN:
 
 # add your own check function to the healthcheck
 def db_available():
-    engine = get_engine()
-    try: 
-        result = engine.execute("SELECT 1")
+    try:
+        result = db.engine.execute("SELECT 1")
         result.close()
         return True, "db ok"
     except Exception as exp:

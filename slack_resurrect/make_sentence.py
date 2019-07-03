@@ -4,7 +4,8 @@ import re
 
 from sqlalchemy import desc, func
 
-from .model import WordEntry, get_session, User
+from .db import db
+from .model import WordEntry, User
 from .talker_exceptions import UserNotFoundException, UserHasntSpoken
 
 # for each possible next word sampled from the crowd
@@ -12,15 +13,12 @@ from .talker_exceptions import UserNotFoundException, UserHasntSpoken
 WORD_PAIRS_WEIGHT = 1
 SENTENCE_WORD_LIMIT = 100
 
-SESSION = get_session()
-
-
 def get_next_word(user, word, last_words):
-    user_words = SESSION.query(WordEntry).filter(
+    user_words = db.session.query(WordEntry).filter(
         WordEntry.user == user.id, WordEntry.word_prev == word
     ).order_by(desc(WordEntry.count)).limit(10)
 
-    user_word_pairs = SESSION.query(WordEntry).filter(
+    user_word_pairs = db.session.query(WordEntry).filter(
         WordEntry.user == user.id, WordEntry.word_prev == last_words
     ).order_by(desc(WordEntry.count)).limit(5)
 
@@ -39,7 +37,7 @@ def get_next_word(user, word, last_words):
 def make_sentence(team_id, username, prompt=""):
     sentence = ''
     # Try to find the user
-    user = User.byname(SESSION, team_id, username)
+    user = User.byname(db.session, team_id, username)
     if not user:
         raise UserNotFoundException(
             'Username "{}" not found'.format(username))
@@ -47,14 +45,14 @@ def make_sentence(team_id, username, prompt=""):
     sentence = ''
     word = ''
     if prompt:  # Load up an initial word
-        word = SESSION.query(WordEntry).filter(
+        word = db.session.query(WordEntry).filter(
             WordEntry.user == user.id,
             WordEntry.word_prev == prompt
         ).order_by(func.random()).first()
     if word:
         sentence += word.word_prev + " "
     else:
-        word = SESSION.query(WordEntry).filter(
+        word = db.session.query(WordEntry).filter(
             WordEntry.user == user.id,
             WordEntry.word_prev == ''
         ).order_by(func.random()).first()
@@ -83,7 +81,7 @@ def make_sentence(team_id, username, prompt=""):
     user_ids = re.finditer(r'(@[\d\w]{9})', sentence)
     for match in user_ids:
         user_id = match.group()
-        user = SESSION.query(User).filter(
+        user = db.session.query(User).filter(
             User.id == user_id.strip('@')).first()
         if not user:
             continue

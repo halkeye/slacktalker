@@ -14,6 +14,7 @@ class Config:
     DEBUG = False
     TESTING = False
     DEBUG_SQL = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SENTRY_TOKEN = os.environ.get('SENTRY_TOKEN')
     SENTRY_ENVIRONMENT = None
     SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')

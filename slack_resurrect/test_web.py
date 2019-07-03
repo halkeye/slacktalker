@@ -2,14 +2,15 @@ import unittest
 import requests_mock
 from mock import patch
 from .web import app
-from .model import create_all
+from .db import db
 
 
 class WebTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
         app.debug = True
-        create_all()
+        with app.app_context():
+            db.create_all()
 
     def tearDown(self):
         pass

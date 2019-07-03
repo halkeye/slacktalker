@@ -1,23 +1,16 @@
-# coding: utf-8
 import random
-from sqlalchemy import Column, Integer, String, desc
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from .db import db
 from .settings import CONFIG
 
 
-BaseModel = declarative_base()  # pylint: disable=invalid-name
-
-
-class WordEntry(BaseModel):
+class WordEntry(db.Model):
 
     __tablename__ = 'word_entries'
 
-    user = Column('user', String(9), primary_key=True)
-    word_prev = Column('word_prev', String(255), primary_key=True)
-    word_next = Column('word_next', String(255), primary_key=True)
-    count = Column('count', Integer, nullable=False, index=True)
+    user = db.Column('user', db.String(9), primary_key=True)
+    word_prev = db.Column('word_prev', db.String(255), primary_key=True)
+    word_next = db.Column('word_next', db.String(255), primary_key=True)
+    count = db.Column('count', db.Integer, nullable=False, index=True)
 
     def __repr__(self):
         return "<model.WordEntry '{}:{}:{}'>".format(self.user, self.word_prev,
@@ -27,20 +20,20 @@ class WordEntry(BaseModel):
         words = session.query(WordEntry).filter(
             WordEntry.user == self.user,
             WordEntry.word_prev == self.word_next
-        ).order_by(desc(WordEntry.count)).limit(10)
+        ).order_by(WordEntry.count.desc).limit(10)
         return random.choice(list(words))
 
 
-class User(BaseModel):
+class User(db.Model):
 
     __tablename__ = 'users'
 
-    id = Column('id', String(9), primary_key=True)
-    name = Column('name', String(255))
-    real_name = Column('real_name', String(255))
-    first_name = Column('first_name', String(255))
-    last_name = Column('last_name', String(255))
-    team_id = Column('team_id', String(255))
+    id = db.Column('id', db.String(9), primary_key=True)
+    name = db.Column('name', db.String(255))
+    real_name = db.Column('real_name', db.String(255))
+    first_name = db.Column('first_name', db.String(255))
+    last_name = db.Column('last_name', db.String(255))
+    team_id = db.Column('team_id', db.String(255))
 
     @classmethod
     def new_from_slack(cls, slack_user):
@@ -75,22 +68,3 @@ class User(BaseModel):
                 str(self.last_name)
             )
         return str(self.name)
-
-
-ENGINE = None
-
-
-def get_engine():
-    global ENGINE
-    if not ENGINE:
-        ENGINE = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI, echo=CONFIG.DEBUG_SQL)
-    return ENGINE
-
-
-def get_session():
-    session = sessionmaker(bind=get_engine())
-    return session()
-
-
-def create_all():
-    BaseModel.metadata.create_all(get_engine())

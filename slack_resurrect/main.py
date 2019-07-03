@@ -4,7 +4,8 @@ Slack glue to the resurrect modules
 import re
 import logging
 from slack import WebClient
-from .model import get_session, User, WordEntry
+from .model import User, WordEntry
+from .db import db
 from .talker_exceptions import TalkerException
 from .make_sentence import make_sentence
 from .settings import CONFIG
@@ -50,15 +51,14 @@ def save_user(item):
 
 
 def save_actual_user(userId):
-    session = get_session()
-    db_user = User.byid(session, userId)
+    db_user = User.byid(db.session, userId)
 
     if not db_user:
         slack_user = SLACK_CLIENT.users_info(user=userId).get('user')
         db_user = User.new_from_slack(slack_user)
-        session.add(db_user)
+        db.session.add(db_user)
 
-    session.commit()
+    db.session.commit()
     return db_user
 
 
@@ -80,13 +80,12 @@ def save_message(item):
     # Ignore edits
     if 'subtype' in item:
         return
-    session = get_session()
     words = item['text'].split()
     for i in list(range(len(words) + 1)):
         user = item['user']
         word_prev = words[i - 1].lower()[:254] if i > 0 else ''
         word_next = words[i].lower()[:254] if i < len(words) else ''
-        word_entry = session.query(WordEntry).filter(
+        word_entry = db.session.query(WordEntry).filter(
             WordEntry.user == user,
             WordEntry.word_prev == word_prev,
             WordEntry.word_next == word_next
@@ -98,7 +97,7 @@ def save_message(item):
             word_entry.word_next = word_next
             word_entry.count = 0
         word_entry.count += 1
-        session.add(word_entry)
+        db.session.add(word_entry)
 
     #two word combos
     for i, word_next in enumerate(words):
@@ -109,7 +108,7 @@ def save_message(item):
             words[i - 2].lower()[:254],
             words[i - 1].lower()[:254]
         )
-        word_entry = session.query(WordEntry).filter(
+        word_entry = db.session.query(WordEntry).filter(
             WordEntry.user == user,
             WordEntry.word_prev == word_prev,
             WordEntry.word_next == word_next
@@ -122,9 +121,9 @@ def save_message(item):
             word_entry.count = 0
         word_entry.count += 1
 
-        session.add(word_entry)
+        db.session.add(word_entry)
 
-    session.commit()
+    db.session.commit()
 
 
 def parse_message_event(event):
