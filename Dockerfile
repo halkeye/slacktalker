@@ -1,4 +1,4 @@
-FROM python:3.7.3-stretch
+FROM python:3.7.4-stretch
 WORKDIR /usr/src/app
 COPY requirements.txt .
 RUN pip install --upgrade -r requirements.txt
