@@ -16,6 +16,8 @@ pipeline {
         stage('Before Install') {
           steps {
             sh """
+              python -m venv venv
+              . venv/bin/activate
               pip install --upgrade pip
               pip install --upgrade setuptools
               pip install --upgrade pytest
@@ -26,13 +28,16 @@ pipeline {
 
         stage('Install') {
           steps {
-            sh "pip install --upgrade -r dev_requirements.txt"
+            sh """
+            . venv/bin/activate
+            pip install --upgrade -r dev_requirements.txt
+            """
           }
         }
 
         stage('Lint') {
           steps {
-            sh 'flake8 --format=pylint *.py slack_resurrect | tee pylint.log'
+            sh '. venv/bin/activate;flake8 --format=pylint *.py slack_resurrect | tee pylint.log'
           }
           post {
             always {
@@ -44,7 +49,7 @@ pipeline {
 
         stage('Test') {
           steps {
-            sh 'py.test  --junitxml=pytest-report.xml --cov-report xml --cov --cov-report term-missing'
+            sh '. venv/bin/activate;py.test  --junitxml=pytest-report.xml --cov-report xml --cov --cov-report term-missing'
           }
           post {
             always {
@@ -55,7 +60,7 @@ pipeline {
 
         stage('Coverage') {
           steps {
-            sh 'coverage xml -i'
+            sh '. venv/bin/activate;coverage xml -i'
           }
           post {
             always {
